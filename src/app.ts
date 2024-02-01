@@ -30,6 +30,16 @@ export const AppContext: AppContextType = {
     onChange:[]
 }
 
+const bookmarksJSON = localStorage.getItem ('bookmarks');
+
+if (bookmarksJSON)
+    AppContext.bookmarks = JSON.parse (bookmarksJSON);
+
+AppContext.onChange.push (id => {
+    if (id === 'BOOKMARKS')
+        localStorage.setItem ('bookmarks', JSON.stringify (AppContext.bookmarks));
+})
+
 class App 
 {
     search = new Search ();
