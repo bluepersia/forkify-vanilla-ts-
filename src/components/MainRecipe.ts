@@ -22,7 +22,39 @@ export default class MainRecipe
 
     constructor ()
     {
-        AppContext.onChange.push (id => id === 'ACTIVE_ID' ? this.fetchRecipe (AppContext.activeId) : null)
+        AppContext.onChange.push (id => id === 'ACTIVE_ID' ? this.fetchRecipe (AppContext.activeId) : null);
+
+        this.recipeDiv.addEventListener ('click', this.handleClick.bind (this));
+    }
+
+    handleClick (e:MouseEvent): void
+    {
+        if (this.state.recipe)
+        {
+            const target = e.target as HTMLElement;
+
+            if (target.closest ('.btn--decrease-servings'))
+                this.setServings (this.state.recipe.servings - 1);
+            else if (target.closest ('.btn--increase-servings'))
+                this.setServings (this.state.recipe.servings + 1);
+        }
+    }
+
+    setServings (newServings:number) : void
+    {
+        if (newServings < 1 || newServings > 8)
+            return;
+        
+        if (this.state.recipe)
+        {
+            const mult = newServings / this.state.recipe.servings;
+
+            this.state.recipe.cooking_time *= mult;
+            this.state.recipe.ingredients.forEach (ing => ing.quantity *= mult);
+            this.state.recipe.servings = newServings;
+
+            this.render ();
+        }
     }
 
     async fetchRecipe (id:string) : Promise<void>
