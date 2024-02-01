@@ -11,6 +11,8 @@ type State = {
     page:number
 }
 
+
+
 export default class Search 
 {
     state : State = {
@@ -19,7 +21,7 @@ export default class Search
         results: [],
         page: 1
     }
-
+    
 
     searchForm = document.querySelector<HTMLFormElement> ('.search')!;
     resultsUl = document.querySelector<HTMLUListElement> ('.results')!;
