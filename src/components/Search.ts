@@ -1,3 +1,4 @@
+import { AppContext } from "../app";
 import { IRecipe } from "../models/recipe"
 import { apiKey, baseURL } from "../utility";
 import ErrorDisplay from "./ErrorDisplay";
@@ -31,6 +32,8 @@ export default class Search
     {
         this.searchForm.addEventListener ('submit', this.handleSubmit.bind (this));
         this.paginationDiv.addEventListener ('click', this.handlePaginationClick.bind(this));
+
+        AppContext.onChange.push (id => id === 'ACTIVE_ID' ? this.render() : null);
     }
 
     get totalPages () : number 
