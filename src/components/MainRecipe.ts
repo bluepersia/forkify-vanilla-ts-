@@ -33,6 +33,12 @@ export default class MainRecipe
         {
             const target = e.target as HTMLElement;
 
+            if (target.closest ('.btn-bookmark'))
+            {
+                AppContext.bookmark (this.state.recipe);
+                return;
+            }
+
             if (target.closest ('.btn--decrease-servings'))
                 this.setServings (this.state.recipe.servings - 1);
             else if (target.closest ('.btn--increase-servings'))
