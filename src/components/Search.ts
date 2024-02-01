@@ -7,7 +7,8 @@ import Spinner from "./Spinner";
 type State = {
     isLoading: boolean,
     error: Error | null,
-    results: IRecipe[]
+    results: IRecipe[],
+    page:number
 }
 
 export default class Search 
@@ -15,16 +16,53 @@ export default class Search
     state : State = {
         isLoading: false,
         error: null,
-        results: []
+        results: [],
+        page: 1
     }
+
 
     searchForm = document.querySelector<HTMLFormElement> ('.search')!;
     resultsUl = document.querySelector<HTMLUListElement> ('.results')!;
+    paginationDiv = document.querySelector<HTMLDivElement>('.pagination')!;
 
     constructor ()
     {
         this.searchForm.addEventListener ('submit', this.handleSubmit.bind (this));
+        this.paginationDiv.addEventListener ('click', this.handlePaginationClick.bind(this));
     }
+
+    get totalPages () : number 
+    {
+        return Math.ceil (this.state.results.length / 10);
+    }
+
+    get currentPage () : IRecipe[]
+    {
+        const endIndex = this.state.page * 10;
+        const startIndex = endIndex - 10;
+
+        return this.state.results.slice (startIndex, endIndex);
+    }
+    
+    setPage (page:number) : void 
+    {
+        if (page > this.totalPages || page < 1)
+            return;
+
+        this.state.page = page;
+        this.render ();
+    }
+
+    handlePaginationClick (e:MouseEvent) : void
+    {
+        const target = e.target as HTMLElement;
+
+        if (target.closest ('.pagination__btn--prev'))
+            this.setPage (this.state.page - 1)
+        else if (target.closest ('.pagination__btn--next'))
+            this.setPage (this.state.page + 1);
+    }
+
 
     handleSubmit (e:SubmitEvent) : void
     {
@@ -74,6 +112,19 @@ export default class Search
             return;
         }
 
-       this.resultsUl.innerHTML = this.state.results.map (recipe => RecipePreview(recipe)).join ('');
+       this.resultsUl.innerHTML = this.currentPage.map (recipe => RecipePreview(recipe)).join ('');
+
+       this.paginationDiv.innerHTML = `${this.state.page > 1 ? `<button class="btn--inline pagination__btn--prev">
+       <svg class="search__icon">
+         <use href="src/img/icons.svg#icon-arrow-left"></use>
+       </svg>
+       <span>Page ${this.state.page - 1}</span>
+     </button>` : ``}
+     ${this.state.page < this.totalPages ? `<button class="btn--inline pagination__btn--next">
+       <span>Page ${this.state.page + 1}</span>
+       <svg class="search__icon">
+         <use href="src/img/icons.svg#icon-arrow-right"></use>
+       </svg>
+     </button>`: ``} `
     }
 }
